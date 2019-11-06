@@ -141,12 +141,12 @@ __yush_level() {
 # argument, coloured if necessary.
 __yush_coloured_level() {
     case "$1" in
-        0) yush_dark_gray "trace "; return;;
-        1) yush_light_gray "debug "; return;;
+        0) yush_dark_gray " trace"; return;;
+        1) yush_light_gray " debug"; return;;
         2) yush_cyan " info "; return;;
         3) yush_yellow "notice"; return;;
         4) yush_red " WARN "; return;;
-        5) yush_magenta "ERROR "; return;;
+        5) yush_magenta " ERROR"; return;;
         *) echo "$1"; return;;
     esac
 }

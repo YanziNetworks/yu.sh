@@ -1,3 +1,6 @@
+#!/bin/sh
+
+set -e
 
 ######## This is a slightly YUSHified version of https://github.com/rcrowley/json.sh
 

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 # Return the approx. number of seconds for the human-readable period passed as a
 # parameter
 yush_howlong() {
