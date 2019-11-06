@@ -8,3 +8,16 @@ and variables that are part of the `yu.sh` library are led by, respectively the
 `yu.sh` is usually best used as a git [submodule].
 
   [submodule]: https://git-scm.com/book/en/v2/Git-Tools-Submodules
+
+Currently, `yu.sh` is composed of the following modules:
+
++ [log.sh] a library for controlled logging, offering various levels
++ [date.sh] a library to convert back and forth between humand-readable periods
+  and seconds, and to convert some date formats not always supported by the
+  `date` command.
++ [json.sh] a library to parse JSON, slightly modified from the fantastic
+  [original](https://github.com/rcrowley/json.sh)
+
+  [log.sh]:./log.sh
+  [date.sh]:./date.sh
+  [json.sh]:./json.sh
