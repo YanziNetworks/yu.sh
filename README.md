@@ -17,7 +17,9 @@ Currently, `yu.sh` is composed of the following modules:
   `date` command.
 + [json.sh] a library to parse JSON, slightly modified from the fantastic
   [original](https://github.com/rcrowley/json.sh)
++ [text.sh] a library to provide higher-level textual operations.
 
   [log.sh]:./log.sh
   [date.sh]:./date.sh
   [json.sh]:./json.sh
+  [text.sh]:./text.sh
