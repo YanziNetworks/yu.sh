@@ -23,3 +23,14 @@ Currently, `yu.sh` is composed of the following modules:
   [date.sh]:./date.sh
   [json.sh]:./json.sh
   [text.sh]:./text.sh
+
+## Testing
+
+This library can be test using [bats] (WIP). From the tests directory, run the
+following command:
+
+```shell
+docker run -it -v "$(pwd):/yu.sh" bats/bats -t /yu.sh/tests
+```
+
+  [bats]: https://github.com/bats-core/bats-core
