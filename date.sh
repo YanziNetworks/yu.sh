@@ -5,52 +5,52 @@ set -e
 # Return the approx. number of seconds for the human-readable period passed as a
 # parameter
 yush_howlong() {
-    if echo "$1"|grep -Eqo '[0-9]+[[:space:]]*[yY]'; then
+    if echo "$1"|grep -Eqo '^[0-9]+[[:space:]]*[yY]'; then
         len=$(echo "$1"  | sed -En 's/([0-9]+)[[:space:]]*[yY].*/\1/p')
         expr "$len" \* 31536000
         return
     fi
-    if echo "$1"|grep -Eqo '[0-9]+[[:space:]]*[Mm][Oo]'; then
+    if echo "$1"|grep -Eqo '^[0-9]+[[:space:]]*[Mm][Oo]'; then
         len=$(echo "$1"  | sed -En 's/([0-9]+)[[:space:]]*[Mm][Oo].*/\1/p')
         expr "$len" \* 2592000
         return
     fi
-    if echo "$1"|grep -Eqo '[0-9]+[[:space:]]*m'; then
+    if echo "$1"|grep -Eqo '^[0-9]+[[:space:]]*m'; then
         len=$(echo "$1"  | sed -En 's/([0-9]+)[[:space:]]*m.*/\1/p')
         expr "$len" \* 2592000
         return
     fi
-    if echo "$1"|grep -Eqo '[0-9]+[[:space:]]*[Ww]'; then
+    if echo "$1"|grep -Eqo '^[0-9]+[[:space:]]*[Ww]'; then
         len=$(echo "$1"  | sed -En 's/([0-9]+)[[:space:]]*[Ww].*/\1/p')
         expr "$len" \* 604800
         return
     fi
-    if echo "$1"|grep -Eqo '[0-9]+[[:space:]]*[Dd]'; then
+    if echo "$1"|grep -Eqo '^[0-9]+[[:space:]]*[Dd]'; then
         len=$(echo "$1"  | sed -En 's/([0-9]+)[[:space:]]*[Dd].*/\1/p')
         expr "$len" \* 86400
         return
     fi
-    if echo "$1"|grep -Eqo '[0-9]+[[:space:]]*[Hh]'; then
+    if echo "$1"|grep -Eqo '^[0-9]+[[:space:]]*[Hh]'; then
         len=$(echo "$1"  | sed -En 's/([0-9]+)[[:space:]]*[Hh].*/\1/p')
         expr "$len" \* 3600
         return
     fi
-    if echo "$1"|grep -Eqo '[0-9]+[[:space:]]*[Mm][Ii]'; then
+    if echo "$1"|grep -Eqo '^[0-9]+[[:space:]]*[Mm][Ii]'; then
         len=$(echo "$1"  | sed -En 's/([0-9]+)[[:space:]]*[Mm][Ii].*/\1/p')
         expr "$len" \* 60
         return
     fi
-    if echo "$1"|grep -Eqo '[0-9]+[[:space:]]*M'; then
+    if echo "$1"|grep -Eqo '^[0-9]+[[:space:]]*M'; then
         len=$(echo "$1"  | sed -En 's/([0-9]+)[[:space:]]*M.*/\1/p')
         expr "$len" \* 60
         return
     fi
-    if echo "$1"|grep -Eqo '[0-9]+[[:space:]]*[Ss]'; then
+    if echo "$1"|grep -Eqo '^[0-9]+[[:space:]]*[Ss]'; then
         len=$(echo "$1"  | sed -En 's/([0-9]+)[[:space:]]*[Ss].*/\1/p')
         echo "$len"
         return
     fi
-    if echo "$1"|grep -E '[0-9]+'; then
+    if echo "$1"|grep -Eqo '^[0-9]+'; then
         echo "$1"
         return
     fi
@@ -76,7 +76,7 @@ yush_human_period(){
             [ $m = 1 ] && printf "%d minute " $m || printf "%d minutes " $m
     fi
     if [ $d = 0 ] && [ $h = 0 ] && [ $m = 0 ]; then
-            [ $s = 1 ] && printf "%d second" $s || printf "%d seconds" $s
+            [ $s = 1 ] && printf "%d second" $s || printf "%d seconds " $s
     fi
     printf '\n'
 }
@@ -119,9 +119,9 @@ yush_iso8601() {
             sign=$(echo "$tz" | sed -E 's/([+-])([0-9]{2}):([0-9]{2})/\1/')
             secs=$((hrs*3600+mns*60))
             if [ "$sign" = "-" ]; then
-                tzdiff=$((-secs))
-            else
                 tzdiff=$secs
+            else
+                tzdiff=$((-secs))
             fi
         fi
     fi
