@@ -26,7 +26,7 @@ Currently, `yu.sh` is composed of the following modules:
 
 ## Testing
 
-This library can be test using [bats] (WIP). From the tests directory, run the
+This library can be tested using [bats]. From the tests directory, run the
 following command:
 
 ```shell
