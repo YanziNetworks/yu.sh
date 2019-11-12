@@ -3,7 +3,7 @@
 `yu.sh` stands for Yanzi Utilities in POSIX Shell. The library provides a number
 of functions and modules that can be sourced in target scripts. All functions
 and variables that are part of the `yu.sh` library are led by, respectively the
-`yush_` and `YUSH_` keywords.
+`yush_` and `YUSH_` keywords. `yu.sh` also provides a few utilities.
 
 `yu.sh` is usually best used as a git [submodule].
 
@@ -30,7 +30,7 @@ This library can be tested using [bats]. From the [test](./test) directory, run 
 following command:
 
 ```shell
-docker run -it -v "$(pwd):/yu.sh" bats/bats -t /yu.sh/tests
+docker run -it -v "$(pwd):/yu.sh" bats/bats -t /yu.sh/test
 ```
 
   [bats]: https://github.com/bats-core/bats-core
