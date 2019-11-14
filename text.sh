@@ -14,6 +14,10 @@ yush_string_first() {
     echo "$1"|awk "END{print index(\$0,\"$2\")}"
 }
 
+yush_string_length() {
+    echo "${#1}"
+}
+
 
 ## Following functions adapted from https://github.com/dylanaraps/pure-sh-bible
 #
@@ -118,4 +122,22 @@ yush_split() {
 
     # Re-enable globbing.
     set +f
+}
+
+yush_string_is_float_strict() {
+    # Usage: is_float "number"
+
+    # The test checks to see that the input contains
+    # a '.'. This filters out whole numbers.
+    [ -z "${1##*.*}" ] &&
+        printf %f "$1" >/dev/null 2>&1
+}
+
+yush_string_is_int() {
+    # usage: is_int "number"
+    printf %d "$1" >/dev/null 2>&1
+}
+
+yush_string_is_float() {
+    yush_string_is_int "$1" || yush_string_is_float_strict "$1"
 }

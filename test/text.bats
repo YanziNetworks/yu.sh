@@ -112,3 +112,59 @@ YUSH_LOG_LEVEL=warn
 @test "Split on nothing" {
     [ "$(yush_split "apple, bananas, oranges" "")" = "apple, bananas, oranges" ]
 }
+
+@test "Length of string" {
+    [ "$(yush_string_length "1234")" = "4" ]
+}
+
+@test "Length of empty string" {
+    [ "$(yush_string_length "")" = "0" ]
+}
+
+@test "String is float" {
+    yush_string_is_float "1.2"
+}
+
+@test "Integer string is float" {
+    yush_string_is_float "1"
+}
+
+@test "Empty string is not int" {
+    if [ yush_string_is_int "" ]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+@test "Empty string is not float" {
+    if [ yush_string_is_float "" ]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+@test "Empty string is not strict float" {
+    if [ yush_string_is_float_strict "" ]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+@test "Integer string is not a strict float" {
+    if [ yush_string_is_float_strict "1" ]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+@test "Non-number is not float" {
+    if [ yush_string_is_float "abc" ]; then
+        return 1
+    else
+        return 0
+    fi
+}
