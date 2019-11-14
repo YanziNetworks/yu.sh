@@ -18,11 +18,13 @@ Currently, `yu.sh` is composed of the following modules:
 + [json.sh] a library to parse JSON, slightly modified from the fantastic
   [original](https://github.com/rcrowley/json.sh)
 + [text.sh] a library to provide higher-level textual operations.
++ [file.sh] a library to operate on files and paths
 
   [log.sh]:./log.sh
   [date.sh]:./date.sh
   [json.sh]:./json.sh
   [text.sh]:./text.sh
+  [file.sh]:./file.sh
 
 ## Testing
 
