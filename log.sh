@@ -10,7 +10,7 @@ set -e
 # logging functions also take an extra argument that will blindly replace the
 # name of application, e.g. for printing the name of an internal module or
 # similar.
-if [ -z "$YUSH_APPNAME" ]; then
+if [ -z "${YUSH_APPNAME:-}" ]; then
     YUSH_APPNAME="${0#\./}"
     YUSH_APPNAME="${YUSH_APPNAME##/*/}"
     YUSH_APPNAME="${YUSH_APPNAME%.*}"
@@ -18,16 +18,16 @@ fi
 
 # YUSH_LOG_PATH is the location of the log. Lines will be appended to that file.
 # It defaults to the standard error.
-[ -z "$YUSH_LOG_PATH" ] && YUSH_LOG_PATH=/dev/stderr
+[ -z "${YUSH_LOG_PATH:-}" ] && YUSH_LOG_PATH=/dev/stderr
 
 # YUSH_LOG_LEVEL is the logging level that decides which lines will be output or
 # kept away from the log. Available levels are: TRACE, DEBUG, INFO, NOTICE,
 # WARN, ERROR. The default is error.
-[ -z "$YUSH_LOG_LEVEL" ] && YUSH_LOG_LEVEL=INFO
+[ -z "${YUSH_LOG_LEVEL:-}" ] && YUSH_LOG_LEVEL=INFO
 
 # YUSH_LOG_COLOUR should be 1 or 0 and decides if log lines should use colouring
 # or not.
-if [ -z "$YUSH_LOG_COLOUR" ]; then
+if [ -z "${YUSH_LOG_COLOUR:-}" ]; then
     if [ -t 1 ]; then
         YUSH_LOG_COLOUR=1
     else
@@ -36,20 +36,20 @@ if [ -z "$YUSH_LOG_COLOUR" ]; then
 fi
 
 # YUSH_LOG_DATE_FORMAT is the date format used for timestamps inserted in log lines.
-[ -z "$YUSH_LOG_DATE_FORMAT" ] && YUSH_LOG_DATE_FORMAT="%Y%m%d-%H%M%S"
+[ -z "${YUSH_LOG_DATE_FORMAT:-}" ] && YUSH_LOG_DATE_FORMAT="%Y%m%d-%H%M%S"
 
 
 # This is the API for the log module. Each function takes at least a message to
 # log. When a second argument is present, it should be the name of the module
 # that is creating the log line. The default log at yush_log() behaves like
 # yush_info()
-yush_trace()    { __yush_log "$1" "TRACE" "$2"; }
-yush_debug()    { __yush_log "$1" "DEBUG" "$2"; }
-yush_info()     { __yush_log "$1" "INFO" "$2"; }
-yush_notice()   { __yush_log "$1" "NOTICE" "$2"; }
-yush_warn()     { __yush_log "$1" "WARN" "$2"; }
-yush_error()    { __yush_log "$1" "ERROR" "$2"; }
-yush_log()      { __yush_log "$1" "INFO" "$2"; }
+yush_trace()    { __yush_log "$1" "TRACE" "${2:-}"; }
+yush_debug()    { __yush_log "$1" "DEBUG" "${2:-}"; }
+yush_info()     { __yush_log "$1" "INFO" "${2:-}"; }
+yush_notice()   { __yush_log "$1" "NOTICE" "${2:-}"; }
+yush_warn()     { __yush_log "$1" "WARN" "${2:-}"; }
+yush_error()    { __yush_log "$1" "ERROR" "${2:-}"; }
+yush_log()      { __yush_log "$1" "INFO" "${2:-}"; }
 
 # A number of utility functions to colourise the string passed as an argument
 # whenever YUSH_LOG_COLOUR is set to 1.
@@ -166,4 +166,3 @@ __yush_log() {
                     "$1" >>$YUSH_LOG_PATH
     fi
 }
-
