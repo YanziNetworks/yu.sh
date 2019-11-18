@@ -3,9 +3,11 @@
 set -e
 
 # Generate a good and shell-safe password, length is passed as an argument
-# (defaults to 24 chars).
+# (defaults to 24 chars). This is cumbersome on purpose to defeat Mac OSX
+# behaviour
 yush_password() {
-    LC_ALL=C tr -dc A-Za-z0-9 </dev/urandom 2>/dev/null | head -c"${1:-24}"; echo
+    len="${1:-24}"
+    LC_ALL=C sed -E 's/[^[:alnum:]]//g' </dev/urandom 2>/dev/null | head -c"$((len*2))" | tr -d '\n' | head -c"$len"
 }
 
 yush_string_first() {
