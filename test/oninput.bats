@@ -19,3 +19,8 @@ ROOT_DIR=$( cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P )
 @test "oninput unsupported option" {
     ! ${YUSH_DIR}/bin/oninput.sh --non-existing-option
 }
+
+@test "Oninput waiting (This will pause 2 secs)" {
+    result=$( (sleep 1; echo "test"; sleep 1; echo "second" ) | ${YUSH_DIR}/bin/oninput.sh --size 128 -- cat)
+    [ "$(echo "$result"|head -1)" = "test" ] && [ "$(echo "$result"|tail -1)" = "second" ] 
+}
