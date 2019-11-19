@@ -1,5 +1,12 @@
 #!/usr/bin/env sh
 
+yush_abspath() {
+    if [ -d "$1" ]; then
+        ( cd -P -- "$1" && pwd -P )
+    else
+        echo "$(yush_abspath "$(yush_dirname "$1")")/$(yush_basename "$1")"
+    fi
+}
 
 ## Following functions adapted from https://github.com/dylanaraps/pure-sh-bible
 #

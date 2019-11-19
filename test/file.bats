@@ -52,3 +52,11 @@ YUSH_LOG_LEVEL=warn
 @test "Basename of directory path" {
     [ "$(basename "/home/user/")" = "user" ]
 }
+
+@test "Absolute path of file" {
+    [ "$(dirname "$(yush_abspath "$0")")" = "$ROOT_DIR" ]
+}
+
+@test "Absolute path of directory" {
+    [ "$(yush_abspath "$(dirname "$0")")" = "$ROOT_DIR" ]
+}
