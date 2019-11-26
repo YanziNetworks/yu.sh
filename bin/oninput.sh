@@ -3,6 +3,7 @@
 # Find yu.sh (tuned for Docker) and load modules
 ROOT_DIR=$( cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P )
 YUSH_DIR="$ROOT_DIR/.."
+# shellcheck source=yu.sh/log.sh disable=SC1091
 . "$YUSH_DIR/log.sh"
 
 BLKSIZE=512
@@ -38,8 +39,10 @@ USAGE
 while [ $# -gt 0 ]; do
     case "$1" in
     -v | --verbose)
+        # shellcheck disable=SC2034
         YUSH_LOG_LEVEL="$2"; shift 2;;
     --verbose=*)
+        # shellcheck disable=SC2034
         YUSH_LOG_LEVEL="${1#*=}"; shift 1;;
 
     -s | --size)
@@ -48,6 +51,7 @@ while [ $# -gt 0 ]; do
         BLKSIZE="${1#*=}"; shift 1;;
 
     --non-interactive | --no-colour | --no-color)
+        # shellcheck disable=SC2034
         YUSH_LOG_COLOUR=0; shift 1;;
 
     --)
@@ -76,7 +80,7 @@ bytes=$(dd bs="$BLKSIZE" count=1 2>/dev/null | base64)
 if [ -n "$bytes" ]; then
     # Now that we have some bytes, start the destination program in the
     # background, making sure that it will receive data from the fifo
-    yush_info "First $BLKSIZE bytes read, starting $@ in the background"
+    yush_info "First $BLKSIZE bytes read, starting $* in the background"
     eval "$@" < "$fifoname" &
 
     # Cache the first bytes to a temporary file
