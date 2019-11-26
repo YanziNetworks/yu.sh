@@ -136,6 +136,9 @@ doexit() {
     exec "$FLOW_END";   # Only reached when non-empty
 }
 
+yush_debug "Starting pulse in background"
+while true; do echo ""; sleep 1; done > "$from" 2>/dev/null &
+
 while [ $# -gt 0 ]; do
     # Read content of contract
     wait=""
@@ -143,6 +146,7 @@ while [ $# -gt 0 ]; do
     output=""
     continue=""
     abort=""
+    timeout=-1
     yush_info "Reading flow: $1"
     while IFS='=' read -r key val; do
         # Skip over lines containing comments.
@@ -164,34 +168,49 @@ while [ $# -gt 0 ]; do
             STATE=WAITING
         else
             STATE=OUTPUT
+            HEADER_SECS=$(date -u +'%s')
             yush_debug "No header to wait, pushing $input"
             printf "%s\n" "$input" >> "$to"
         fi
-        while IFS= read line; do
-            yush_trace "Read: $line"
+        while IFS= read -r line; do
             case $STATE in
                 WAITING)
+                    yush_trace "Read: $line"
                     if echo "$line" | grep -Eqo "$wait"; then
                         yush_debug "End of header detected, matching $wait pushing $input"
                         STATE=OUTPUT
+                        HEADER_SECS=$(date -u +'%s')
                         printf "%s\n" "$input" >> "$to"
                     fi
                     ;;
                 OUTPUT)
-                    yush_debug "First line received, cleaning and continuing"
-                    if [ -n "$output" ] && echo "$line" | grep -Eqo "$output"; then
+                    if [ -n "$line" ]; then
+                        yush_debug "Read: $line"
+                    else
+                        yush_trace "Read: $line"
+                    fi
+
+                    now=$(date -u +'%s')
+                    elapsed=$((now-HEADER_SECS))
+
+                    if [ -n "$line" ] && [ -n "$output" ] && echo "$line" | grep -Eqo "$output"; then
                         yush_debug "Output matched $output, output"
                         echo "$line"
-                        break;
+                        break
                     fi
-                    if [ -n "$continue" ] && echo "$line" | grep -Eqo "$continue"; then
+                    if [ -n "$line" ] && [ -n "$continue" ] && echo "$line" | grep -Eqo "$continue"; then
                         yush_debug "Output matched $continue, continuing to next flow"
-                        break;
+                        break
                     fi
-                    if [ -n "$abort" ] && echo "$line" | grep -Eqo "$abort"; then
+                    if [ -n "$line" ] && [ -n "$abort" ] && echo "$line" | grep -Eqo "$abort"; then
                         yush_debug "Output matched $abort, aborting all flows"
                         doexit 1
-                        break;
+                        break
+                    fi
+                    if [ -n "$timeout" ] && [ "$timeout" -gt "0" ] && [ "$elapsed" -ge "$timeout" ]; then
+                        yush_debug "At least $timeout seconds since header, aborting"
+                        doexit 1
+                        break
                     fi
                     ;;
             esac
