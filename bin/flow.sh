@@ -5,6 +5,8 @@ ROOT_DIR=$( cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P )
 YUSH_DIR="$ROOT_DIR/.."
 # shellcheck source=yu.sh/log.sh disable=SC1091
 . "$YUSH_DIR/log.sh"
+# shellcheck source=yu.sh/log.sh disable=SC1091
+. "$YUSH_DIR/file.sh"
 
 FLOW_COMMAND=${FLOW_COMMAND:-}
 FLOW_SUBST=${FLOW_SUBST:-1}
@@ -126,9 +128,10 @@ EOF
 }
 
 doexit() {
+    exitcode="${1:-0}"
     yush_debug "Removing fifos under $tmpdir"
     rm -rf "$tmpdir"
-    [ -z "$FLOW_END" ] && exit
+    [ -z "$FLOW_END" ] && exit "$exitcode"
     yush_notice "Executing $FLOW_END in place"
     exec "$FLOW_END";   # Only reached when non-empty
 }
@@ -151,7 +154,7 @@ while [ $# -gt 0 ]; do
                 val=$(vars_subst "$val")
             fi
             
-            yush_debug "In $1: Setting $key=$val"
+            yush_debug "In $(yush_basename "$1"): Setting $key=$val"
             export "${key}=${val}" 2>/dev/null || yush_warn "warning $key is not a valid variable name"
         fi
     done < "$1"
@@ -187,7 +190,7 @@ while [ $# -gt 0 ]; do
                     fi
                     if [ -n "$abort" ] && echo "$line" | grep -Eqo "$abort"; then
                         yush_debug "Output matched $abort, aborting all flows"
-                        doexit
+                        doexit 1
                         break;
                     fi
                     ;;
