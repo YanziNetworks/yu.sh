@@ -54,6 +54,8 @@ Usage:
             standard output
   abort     When a line matches this regular expression, abort the entire
             flow control and proceed to exit.
+  timeout   Number of seconds to timeout before aborting flow. Default is
+            to never timeout.
 
 USAGE
     exit "$exitcode"
@@ -127,6 +129,8 @@ EOF
     echo "$substituted"
 }
 
+remove_space(){ tr -d '[:space:]'; }
+
 doexit() {
     exitcode="${1:-0}"
     yush_debug "Removing fifos under $tmpdir"
@@ -158,6 +162,17 @@ while [ $# -gt 0 ]; do
                 val=$(vars_subst "$val")
             fi
             
+            if [ "${val:0:1}" = "@" ]; then
+                fpath=${val:1}
+                if [ "${fpath:0:1}" != "/" ]; then
+                    fpath="$(yush_dirname "$1")"/"${fpath}"
+                fi
+                yush_info "In $(yush_basename "$1"), read value of $key from $fpath"
+                val=$(cat "$fpath" | remove_space)
+                if [ "$FLOW_SUBST" = "1" ]; then
+                    val=$(vars_subst "$val")
+                fi
+            fi
             yush_debug "In $(yush_basename "$1"): Setting $key=$val"
             export "${key}=${val}" 2>/dev/null || yush_warn "warning $key is not a valid variable name"
         fi
