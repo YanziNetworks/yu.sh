@@ -7,7 +7,7 @@ set -e
 # behaviour
 yush_password() {
     len="${1:-24}"
-    LC_ALL=C sed -E 's/[^[:alnum:]]//g' </dev/urandom 2>/dev/null | head -c"$((len*2))" | tr -d '\n' | head -c"$len"
+    LC_ALL=C sed -E 's/[^[:alnum:]]//g' </dev/urandom 2>/dev/null | head -c"$((len*2))" | tr -d '\n' | tr -d '\0' | head -c"$len"
 }
 
 yush_string_first() {

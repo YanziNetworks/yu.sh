@@ -11,7 +11,7 @@ set -e
 # name of application, e.g. for printing the name of an internal module or
 # similar.
 if [ -z "${YUSH_APPNAME:-}" ]; then
-    YUSH_APPNAME="${0#\./}"
+    YUSH_APPNAME="$(basename "${0#\./}")"
     YUSH_APPNAME="${YUSH_APPNAME##/*/}"
     YUSH_APPNAME="${YUSH_APPNAME%.*}"
 fi
