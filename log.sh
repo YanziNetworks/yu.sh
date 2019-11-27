@@ -117,6 +117,17 @@ yush_light_gray() {
     fi
 }
 
+yush_loglevel_ge() {
+    out_level=$(__yush_level "$YUSH_LOG_LEVEL")
+    in_level=$(__yush_level "${1:-INFO}")
+    [ "$out_level" -ge "$in_level" ]
+}
+
+yush_loglevel_le() {
+    out_level=$(__yush_level "$YUSH_LOG_LEVEL")
+    in_level=$(__yush_level "${1:-INFO}")
+    [ "$out_level" -le "$in_level" ]
+}
 
 # Everthing here below are private function for the internal implementation of
 # the module.
