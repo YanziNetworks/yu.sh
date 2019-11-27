@@ -10,6 +10,7 @@ YUSH_DIR="$ROOT_DIR/.."
 
 FLOW_COMMAND=${FLOW_COMMAND:-}
 FLOW_SUBST=${FLOW_SUBST:-1}
+FLOW_PULSE=${FLOW_PULSE:-1}
 FLOW_END=${FLOW_END:-}
 
 
@@ -21,8 +22,8 @@ usage() {
 
 Description:
 
-  $YUSH_APPNAME automates interactive sessions such as telnet dialogs or
-  websocket connections.
+  $YUSH_APPNAME automates line-based interactive sessions such as telnet
+  dialogs or websocket connections.
 
 Usage:
   $(basename "$0") [-option arg --long-option(=)arg] [--] flow_step ...
@@ -49,6 +50,7 @@ Usage:
             Lines will be eaten and ignored until the expression matches.
   input     Line to send to the input of the program, once the header has
             finished (if relevant)
+  sleep     Sleep this many seconds before sending input line (default: 0)
   continue  When a line matches this regular expression, jump to next flow
   output    When a line matches this regular expression, output it on the
             standard output
@@ -56,6 +58,13 @@ Usage:
             flow control and proceed to exit.
   timeout   Number of seconds to timeout before aborting flow. Default is
             to never timeout.
+
+  If the first character after the equal sign is an @ (arobas), then all
+  remaining characters forms the path to a file where to find the content
+  of the key. Relative files will automatically be understood relative to
+  the directory containing the step specification. The content of these
+  file will be substituted with environment variables and all line endings
+  will be removed.
 
 USAGE
     exit "$exitcode"
@@ -75,6 +84,9 @@ while [ $# -gt 0 ]; do
 
         --no-subst)
             FLOW_SUBST=0;;
+
+        --no-pulse)
+            FLOW_PULSE=0;;
 
          -v | --verbose)
             # shellcheck disable=SC2034
@@ -111,8 +123,13 @@ from="$tmpdir"/from.$$
 mkfifo -m 0600 "$to"
 mkfifo -m 0600 "$from"
 
-yush_notice "Starting command $FLOW_COMMAND"
-$FLOW_COMMAND < "$to" > "$from" 2> /dev/null &
+if yush_loglevel_le debug; then
+    yush_notice "Starting command $FLOW_COMMAND"
+    $FLOW_COMMAND < "$to" > "$from" &
+else
+    yush_notice "Starting command $FLOW_COMMAND, ignoring its stderr"
+    $FLOW_COMMAND < "$to" > "$from" 2> /dev/null &
+fi
 PID=$!
 sleep 1000000 > "$to" &
 yush_debug "Command $FLOW_COMMAND has pid: $PID"
@@ -129,7 +146,7 @@ EOF
     echo "$substituted"
 }
 
-remove_space(){ tr -d '[:space:]'; }
+one_line(){ tr -d '\r\n'; }
 
 doexit() {
     exitcode="${1:-0}"
@@ -140,8 +157,14 @@ doexit() {
     exec "$FLOW_END";   # Only reached when non-empty
 }
 
-yush_debug "Starting pulse in background"
-while true; do echo ""; sleep 1; done > "$from" 2>/dev/null &
+if [ "$FLOW_PULSE" ]; then
+    yush_debug "Starting pulse in background"
+    if yush_loglevel_le debug; then
+        while true; do echo ""; sleep 1; done > "$from" 2>/dev/null &
+    else
+        while true; do echo ""; sleep 1; done > "$from" 2>/dev/null &
+    fi
+fi
 
 while [ $# -gt 0 ]; do
     # Read content of contract
@@ -151,6 +174,7 @@ while [ $# -gt 0 ]; do
     continue=""
     abort=""
     timeout=-1
+    sleep=0
     yush_info "Reading flow: $1"
     while IFS='=' read -r key val; do
         # Skip over lines containing comments.
@@ -168,7 +192,7 @@ while [ $# -gt 0 ]; do
                     fpath="$(yush_dirname "$1")"/"${fpath}"
                 fi
                 yush_info "In $(yush_basename "$1"), read value of $key from $fpath"
-                val=$(cat "$fpath" | remove_space)
+                val=$(one_line < "$fpath")
                 if [ "$FLOW_SUBST" = "1" ]; then
                     val=$(vars_subst "$val")
                 fi
@@ -182,10 +206,14 @@ while [ $# -gt 0 ]; do
         if [ -n "$wait" ]; then
             STATE=WAITING
         else
-            STATE=OUTPUT
-            HEADER_SECS=$(date -u +'%s')
             yush_debug "No header to wait, pushing $input"
-            printf "%s\n" "$input" >> "$to"
+            STATE=OUTPUT
+            if [ "$sleep" -gt "0" ]; then
+                yush_debug "Sleeping $sleep before pushing input"
+                sleep "$sleep"
+            fi
+            HEADER_SECS=$(date -u +'%s')
+            printf "%s\n" "$input" > "$to"
         fi
         while IFS= read -r line; do
             case $STATE in
@@ -194,8 +222,12 @@ while [ $# -gt 0 ]; do
                     if echo "$line" | grep -Eqo "$wait"; then
                         yush_debug "End of header detected, matching $wait pushing $input"
                         STATE=OUTPUT
+                        if [ "$sleep" -gt "0" ]; then
+                            yush_debug "Sleeping $sleep before pushing input"
+                            sleep "$sleep"
+                        fi
                         HEADER_SECS=$(date -u +'%s')
-                        printf "%s\n" "$input" >> "$to"
+                        printf "%s\n" "$input" > "$to"
                     fi
                     ;;
                 OUTPUT)
