@@ -147,9 +147,14 @@ EOF
 }
 
 one_line(){ tr -d '\r\n'; }
+remove_space(){ tr -d '[:space:]'; }
 
 doexit() {
     exitcode="${1:-0}"
+    if ps -o pid | tail +1 | grep -q "$PID"; then
+        yush_notice "Killing sub-command at $PID"
+        kill -15 "$PID"
+    fi
     yush_debug "Removing fifos under $tmpdir"
     rm -rf "$tmpdir"
     [ -z "$FLOW_END" ] && exit "$exitcode"
