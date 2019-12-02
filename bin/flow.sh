@@ -152,11 +152,11 @@ remove_space(){ tr -d '[:space:]'; }
 
 doexit() {
     exitcode="${1:-0}"
-    if ps -o pid | tail -n 1 | grep -q "$PID"; then
+    if ps -o pid | tail -n +1 | grep -q "$PID"; then
         yush_notice "Killing sub-command at $PID"
         kill -15 "$PID"
     fi
-    if ps -o pid | tail -n 1 | grep -q "$ALIVE_PID"; then
+    if ps -o pid | tail -n +1 | grep -q "$ALIVE_PID"; then
         yush_notice "Killing keep-alive command at $ALIVE_PID"
         kill -15 "$ALIVE_PID"
     fi
