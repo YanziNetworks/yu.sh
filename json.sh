@@ -141,7 +141,7 @@ _json_char() {
 							_J_BASENAME="$(($_J_BASENAME + 1))"
 							_J_PATHNAME="$_J_DIRNAME$_J_S$_J_BASENAME"
 							_J_STATE="array-odd"
-							continue;;
+							return;;
 						"]") exit;;
 					esac;;
 			esac
