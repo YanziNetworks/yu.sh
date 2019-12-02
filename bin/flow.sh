@@ -138,7 +138,7 @@ yush_debug "Command $FLOW_COMMAND has pid: $PID"
 vars_subst() {
     substituted=$1
     yush_trace "Performing substitution in $1"
-    environment=$(env)
+    environment=$(env|grep -E '^[[:upper:]_]+=')
     while IFS='=' read -r var val; do
         substituted=$(echo "$substituted" | sed -e "s!\$${var}!$val!g")
     done <<EOF
@@ -152,11 +152,11 @@ remove_space(){ tr -d '[:space:]'; }
 
 doexit() {
     exitcode="${1:-0}"
-    if ps -o pid | tail +1 | grep -q "$PID"; then
+    if ps -o pid | tail -n 1 | grep -q "$PID"; then
         yush_notice "Killing sub-command at $PID"
         kill -15 "$PID"
     fi
-    if ps -o pid | tail +1 | grep -q "$ALIVE_PID"; then
+    if ps -o pid | tail -n 1 | grep -q "$ALIVE_PID"; then
         yush_notice "Killing keep-alive command at $ALIVE_PID"
         kill -15 "$ALIVE_PID"
     fi
@@ -195,7 +195,7 @@ while [ $# -gt 0 ]; do
             if [ "$FLOW_SUBST" = "1" ]; then
                 val=$(vars_subst "$val")
             fi
-            
+
             if [ "${val:0:1}" = "@" ]; then
                 fpath=${val:1}
                 if [ "${fpath:0:1}" != "/" ]; then
