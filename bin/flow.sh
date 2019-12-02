@@ -132,6 +132,7 @@ else
 fi
 PID=$!
 sleep 1000000 > "$to" &
+ALIVE_PID=$!
 yush_debug "Command $FLOW_COMMAND has pid: $PID"
 
 vars_subst() {
@@ -154,6 +155,10 @@ doexit() {
     if ps -o pid | tail +1 | grep -q "$PID"; then
         yush_notice "Killing sub-command at $PID"
         kill -15 "$PID"
+    fi
+    if ps -o pid | tail +1 | grep -q "$ALIVE_PID"; then
+        yush_notice "Killing keep-alive command at $ALIVE_PID"
+        kill -15 "$ALIVE_PID"
     fi
     yush_debug "Removing fifos under $tmpdir"
     rm -rf "$tmpdir"
