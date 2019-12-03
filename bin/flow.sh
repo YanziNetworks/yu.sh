@@ -196,9 +196,10 @@ while [ $# -gt 0 ]; do
                 val=$(vars_subst "$val")
             fi
 
-            if [ "${val:0:1}" = "@" ]; then
-                fpath=${val:1}
-                if [ "${fpath:0:1}" != "/" ]; then
+            if [ "$(echo "$val" | cut -c1-1)" = "@" ]; then
+                fpath=$(echo "$val" | cut -c2-)
+                first_char=$(echo "$fpath" | cut -c1-1)
+                if [ "$first_char" != "/" ] && [ "$first_char" != "~" ]; then
                     fpath="$(yush_dirname "$1")"/"${fpath}"
                 fi
                 yush_info "In $(yush_basename "$1"), read value of $key from $fpath"
