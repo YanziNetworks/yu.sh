@@ -60,3 +60,24 @@ YUSH_LOG_LEVEL=warn
 @test "Absolute path of directory" {
     [ "$(yush_abspath "$(dirname "$0")")" = "$ROOT_DIR" ]
 }
+
+@test "Temp directory is a directory" {
+    run yush_mktemp -d
+    [ "$status" -eq 0 ]
+    [ -d "$output" ]
+    rmdir "$output"
+}
+
+@test "Temp file is a file" {
+    run yush_mktemp
+    [ "$status" -eq 0 ]
+    [ -f "$output" ]
+    rm "$output"
+}
+
+@test "Temp directory contains template start" {
+    run yush_mktemp -d mytemplate.XXXXXX
+    [ "$status" -eq 0 ]
+    echo "$output" | grep -q 'mytemplate'
+    rmdir "$output"
+}

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-bats -p $(dirname "$0")
+bats -p "$(dirname "$0")"
