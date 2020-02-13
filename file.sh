@@ -8,6 +8,40 @@ yush_abspath() {
     fi
 }
 
+yush_mktemp() {
+    _yush_mkdir=0
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            -d | --dir*)
+                _yush_mkdir=1; shift 1;;
+
+            --)
+                shift; break;;
+            -*)
+                echo "Unknown option: $1 !" >&2;;
+            *)
+                break;;
+        esac
+    done
+
+    if [ -z "$1" ]; then
+        _yush_tpl="${YUSH_APPNAME:-tmp}.XXXXXXXX"
+    else
+        _yush_tpl="$1"
+    fi
+
+    if [ "$_yush_mkdir" = "1" ]; then
+        _yush_opts="-d"
+    fi
+
+    if [ "$(uname -s)" = "Darwin" ]; then
+        _yush_tmp=${TMPDIR:-/tmp}
+        mktemp $_yush_opts "${_yush_tmp%/}/$_yush_tpl"
+    else
+        mktemp $_yush_opts -t "$_yush_tpl"
+    fi
+}
+
 ## Following functions adapted from https://github.com/dylanaraps/pure-sh-bible
 #
 # The MIT License (MIT)
