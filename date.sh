@@ -114,8 +114,9 @@ yush_iso8601() {
         if [ "$tz" = "Z" ]; then
             tzdiff=0
         else
-            hrs=$(printf "%d" "$(echo "$tz" | sed -E 's/[+-]([0-9]{2}):([0-9]{2})/\1/')")
-            mns=$(printf "%d" "$(echo "$tz" | sed -E 's/[+-]([0-9]{2}):([0-9]{2})/\2/')")
+            hrs=$(echo "$tz" | sed -E 's/[+-]([0-9]{2}):([0-9]{2})/\1/')
+            mns=$(echo "$tz" | sed -E 's/[+-]([0-9]{2}):([0-9]{2})/\2/')
+            hrs=${hrs##0}; mns=${mns##0};   # Strip leading 0s
             sign=$(echo "$tz" | sed -E 's/([+-])([0-9]{2}):([0-9]{2})/\1/')
             secs=$((hrs*3600+mns*60))
             if [ "$sign" = "-" ]; then
