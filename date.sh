@@ -137,3 +137,13 @@ yush_iso8601() {
     fi
     expr "$secs" + \( "$tzdiff" \)
 }
+
+yush_from_epoch() {
+    _epoch="${1:-"$(date +'%s')"}"
+    shift
+    if [ "$(uname -s)" = "Darwin" ]; then
+        date -j -f %s "$_epoch" "$@"
+    else
+        date -d @"$_epoch" "$@"
+    fi
+}
