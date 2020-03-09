@@ -126,6 +126,23 @@ yush_split() {
     set +f
 }
 
+# Remove non-printable characters, respecting the current locale as much as
+# possible. In other words, this will only output ASCII characters whenever
+# removal leads to error on the current locale.
+yush_printable() {
+    errexit=$(echo "$-"|grep -q 'e')
+    set +e
+    clean=$(echo "$1" | tr -cd '[:print:]')
+    # shellcheck disable=SC2181
+    if [ "$?" != "0" ]; then
+        clean=$(echo "$1" | LC_CTYPE=C tr -cd '[:print:]' 2>/dev/null)
+    fi
+    printf '%s\n' "$clean"
+    if $errexit; then
+        set -e
+    fi
+}
+
 yush_string_is_float_strict() {
     # Usage: is_float "number"
 
