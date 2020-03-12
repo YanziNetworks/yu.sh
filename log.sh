@@ -171,9 +171,9 @@ __yush_log() {
     in_level=$(__yush_level "${2:-INFO}")
     if [ "$in_level" -ge "$out_level" ]; then
         printf "[%s] [%s] [%s] %s\n" \
-                    "$(__yush_coloured_level "$in_level")" \
                     "$(date +"$YUSH_LOG_DATE_FORMAT")" \
                     "$(yush_blue "${3:-$YUSH_APPNAME}")" \
+                    "$(__yush_coloured_level "$in_level")" \
                     "$1" >>$YUSH_LOG_PATH
     fi
 }
