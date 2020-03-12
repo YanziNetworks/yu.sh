@@ -10,3 +10,21 @@ yush_b64_decode() {
         base64 -d; # Alpine/budybox does not understand --decode
     fi
 }
+
+
+# This is a very-poor-man's envsubst. It has no support for default values.
+yush_envsubst() {
+    substituted=$1
+    environment=$(env|grep -E '^[0-9[:upper:]_]+=')
+    while IFS='=' read -r var val; do
+        for separator in ! ~ ^ % \; /; do
+            if ! echo "$val" | grep -qo "$separator"; then
+                substituted=$(echo "$substituted" | sed -e "s${separator}\$${var}${separator}$val${separator}g")
+                break
+            fi
+        done
+    done <<EOF
+$environment
+EOF
+    echo "$substituted"
+}

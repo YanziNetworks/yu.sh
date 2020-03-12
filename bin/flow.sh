@@ -183,19 +183,6 @@ start_slave() {
     fi
 }
 
-# This is a very-poor-man's envsubst. It has no support for default values.
-vars_subst() {
-    substituted=$1
-    yush_trace "Performing substitution in $1"
-    environment=$(env|grep -E '^[0-9[:upper:]_]+=')
-    while IFS='=' read -r var val; do
-        substituted=$(echo "$substituted" | sed -e "s!\$${var}!$val!g")
-    done <<EOF
-$environment
-EOF
-    echo "$substituted"
-}
-
 one_line(){ tr -d '\r\n'; }
 remove_space(){ tr -d '[:space:]'; }
 pid_running() { ps -o pid | tail -n +1 | grep -q "$1"; }
@@ -246,7 +233,7 @@ while [ $# -gt 0 ]; do
 
         if [ -n "$key" ]; then
             if [ "$FLOW_SUBST" = "1" ]; then
-                val=$(vars_subst "$val")
+                val=$(yush_envsubst "$val")
             fi
 
             if [ "$(echo "$val" | cut -c1-1)" = "@" ]; then
@@ -258,7 +245,7 @@ while [ $# -gt 0 ]; do
                 yush_info "In $(yush_basename "$1"), read value of $key from $fpath"
                 val=$(one_line < "$fpath")
                 if [ "$FLOW_SUBST" = "1" ]; then
-                    val=$(vars_subst "$val")
+                    val=$(yush_envsubst "$val")
                 fi
             fi
             yush_debug "In $(yush_basename "$1"): Setting $key=$val"
