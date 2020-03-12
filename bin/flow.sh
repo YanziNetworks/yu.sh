@@ -9,6 +9,8 @@ YUSH_DIR="$ROOT_DIR/.."
 . "$YUSH_DIR/file.sh"
 # shellcheck source=yu.sh/log.sh disable=SC1091
 . "$YUSH_DIR/text.sh"
+# shellcheck source=yu.sh/log.sh disable=SC1091
+. "$YUSH_DIR/multi-arch.sh"
 
 FLOW_COMMAND=${FLOW_COMMAND:-}
 FLOW_SUBST=${FLOW_SUBST:-1}
