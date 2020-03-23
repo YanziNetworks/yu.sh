@@ -20,6 +20,9 @@ yush_string_length() {
     echo "${#1}"
 }
 
+yush_regex_escape() {
+    printf %s\\n "$1" | sed -e 's/[]\/$*.^|[]/\\&/g'
+}
 
 ## Following functions adapted from https://github.com/dylanaraps/pure-sh-bible
 #
