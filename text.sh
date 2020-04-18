@@ -163,3 +163,11 @@ yush_string_is_int() {
 yush_string_is_float() {
     yush_string_is_int "$1" || yush_string_is_float_strict "$1"
 }
+
+yush_is_true() {
+    case "$(printf %s\\n "$1" | tr '[:upper:]' '[:lower:]')" in
+        "0" | "false" | "off" | "no")
+            return 1;;
+    esac
+    return 0
+}
