@@ -129,6 +129,16 @@ yush_split() {
     set +f
 }
 
+# Performs glob matching, little like Tcl.
+# $1 is the matching pattern
+# $2 is the string to test against
+yush_glob() {
+    case "$2" in
+        $1) return 0;;
+    esac
+    return 1
+}
+
 # Remove non-printable characters, respecting the current locale as much as
 # possible. In other words, this will only output ASCII characters whenever
 # removal leads to error on the current locale.
