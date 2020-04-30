@@ -21,7 +21,7 @@ FLOW_PREFIX=${FLOW_PREFIX:-"FLOWSTEP_"}
 
 # Print usage on stderr and exit
 usage() {
-    [ -n "$1" ] && echo "$1" >/dev/stderr
+    [ -n "$1" ] && echo "$1" >&2
     exitcode="${2:-1}"
     cat <<USAGE >&2
 
