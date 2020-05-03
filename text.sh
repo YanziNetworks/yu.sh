@@ -129,13 +129,16 @@ yush_split() {
     set +f
 }
 
-# Performs glob matching, little like Tcl.
+# Performs glob matching, little like Tcl. Explicit support for |, which
+# otherwise is outside POSIX. See: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_13
 # $1 is the matching pattern
 # $2 is the string to test against
 yush_glob() {
-    case "$2" in
-        $1) return 0;;
-    esac
+    for ptn in $(yush_split "$1" "|"); do
+        case "$2" in
+            $ptn) return 0;;
+        esac
+    done
     return 1
 }
 
