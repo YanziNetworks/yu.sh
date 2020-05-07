@@ -157,7 +157,7 @@ yush_basename() {
 
     # If a suffix was passed to the function, remove it from
     # the end of the resulting string.
-    dir=${dir%"$2"}
+    [ "$#" -gt "1" ] && dir=${dir%"$2"}
 
     # Print the resulting string and if it is empty,
     # print '/'.
