@@ -8,6 +8,11 @@ yush_abspath() {
     fi
 }
 
+yush_is_abspath() {
+    _first=$(printf %s\\n "$1" | cut -c "1")
+    [ "$_first" = "/" ] || [ "$_first" = "~" ]
+}
+
 yush_mktemp() {
     _yush_mkdir=0
     while [ $# -gt 0 ]; do
