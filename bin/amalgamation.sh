@@ -12,7 +12,8 @@ YUSH_DIR="$ROOT_DIR/.."
 # shellcheck source=yu.sh/log.sh disable=SC1091
 . "$YUSH_DIR/text.sh"
 
-AMLG_ROOT=
+AMLG_ROOT=${AMLG_ROOT:-}
+AMLG_MINIFY=${AMLG_MINIFY:-0}
 
 # Print usage on stderr and exit
 usage() {
@@ -51,6 +52,9 @@ while [ $# -gt 0 ]; do
             # shellcheck disable=SC2034
             AMLG_ROOT="${1#*=}"; shift 1;;
 
+        --minify)
+            AMLG_MINIFY=1; shift;;
+
         --non-interactive | --no-colour | --no-color)
             # shellcheck disable=SC2034
             YUSH_LOG_COLOUR=0; shift 1;;
@@ -67,14 +71,45 @@ while [ $# -gt 0 ]; do
     esac
 done
 
+strip() {
+    sed -E \
+        -e 's/;[[:space:]]*#[[:space:][:alnum:]\-_.,;#]+$//' \
+        -e 's/^[[:space:]]*#[^!].*$//' \
+        -e 's/^[[:space:]]*#[[:space:]]*$//' \
+        -e 's/^[[:space:]]*$//'
+}
+
+minify_line() {
+    if [ "$AMLG_MINIFY" = "0" ]; then
+        printf %s\\n "$1"
+    else
+        line=$(printf %s\\n "$1" | strip)
+        yush_debug "Stripped: $1 => $line"
+        if [ -n "$line" ]; then
+            printf %s\\n "$line"
+        fi
+    fi
+}
+
+minify() {
+    while IFS= read -r line || [ -n "$line" ]; do
+        minify_line "$line"
+    done < "$1"
+}
+
 inline() {
     for _p in $1; do
         if [ -f "$_p" ]; then
-            echo ""
-            echo "### Inlining $_p"
-            cat "$_p"
-            echo ""
-            echo "### End of inlining $_p"
+            if [ "$AMLG_MINIFY" = "0" ]; then
+                echo ""
+                echo "### Inlining $_p"
+                cat "$_p"
+                echo ""
+                echo "### End of inlining $_p"
+            else
+                minify "$_p"
+                echo ""
+            fi
         fi
     done
 }
@@ -109,7 +144,7 @@ amalgamation() {
                     fi
                 done
             else
-                printf %s\\n "$line"
+                minify_line "$line"
             fi
         elif printf %s\\n "$line" | grep -Eiq '^###[[:space:]]+AMLG_END'; then
             _skip=0
