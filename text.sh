@@ -76,7 +76,7 @@ yush_string_rtrim() {
 }
 
 yush_string_trim() {
-    yush_string_rtrim "$(yush_string_ltrim "$1" "$2")" "$2"
+    yush_string_rtrim "$(yush_string_ltrim "$1")"
 }
 
 # shellcheck disable=SC2086,SC2048
