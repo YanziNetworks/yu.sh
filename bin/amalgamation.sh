@@ -84,7 +84,7 @@ minify_line() {
         printf %s\\n "$1"
     else
         line=$(printf %s\\n "$1" | strip)
-        yush_debug "Stripped: $1 => $line"
+        yush_trace "Stripped: $1 => $line"
         if [ -n "$line" ]; then
             printf %s\\n "$line"
         fi
@@ -92,14 +92,20 @@ minify_line() {
 }
 
 minify() {
-    while IFS= read -r line || [ -n "$line" ]; do
-        minify_line "$line"
-    done < "$1"
+    if yush_loglevel_le TRACE; then
+        while IFS= read -r line || [ -n "$line" ]; do
+            minify_line "$line"
+        done < "$1"
+    else
+        strip < "$1"
+        return
+    fi
 }
 
 inline() {
     for _p in $1; do
         if [ -f "$_p" ]; then
+            yush_info "Inlining $_p"
             if [ "$AMLG_MINIFY" = "0" ]; then
                 echo ""
                 echo "### Inlining $_p"
@@ -125,6 +131,7 @@ amalgamation() {
     else
         _dir=$AMLG_ROOT
     fi
+    yush_debug "Using $_dir as top directory for relative inlines"
 
     # Do amalgamation, will remove everything between ### AMLG_START and ###
     # AMLG_END markers. All filenames after the ### AMLG_START marker will be
