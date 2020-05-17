@@ -29,11 +29,8 @@ yush_mktemp() {
         esac
     done
 
-    if [ -z "$1" ]; then
-        _yush_tpl="${YUSH_APPNAME:-tmp}.XXXXXXXX"
-    else
-        _yush_tpl="$1"
-    fi
+    _yush_tpl="${YUSH_APPNAME:-tmp}.XXXXXXXX"
+    [ "$#" -gt "0" ] && _yush_tpl="$1"
 
     if [ "$_yush_mkdir" = "1" ]; then
         _yush_opts="-d"
