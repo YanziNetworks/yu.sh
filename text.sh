@@ -82,7 +82,7 @@ yush_string_trim() {
 # shellcheck disable=SC2086,SC2048
 yush_string_trimall() {
     # Disable globbing to make the word-splitting below safe.
-    set -f
+    _oldstate=$(set +o); set -f
 
     # Set the argument list to the word-splitted string.
     # This removes all leading/trailing white-space and reduces
@@ -92,8 +92,8 @@ yush_string_trimall() {
     # Print the argument list as a string.
     printf '%s\n' "$*"
 
-    # Re-enable globbing.
-    set +f
+    # Restore globbing state
+    set +vx; eval "$_oldstate"
 }
 
 yush_split() {
@@ -101,7 +101,7 @@ yush_split() {
 
     # Disable globbing.
     # This ensures that the word-splitting is safe.
-    set -f
+    _oldstate=$(set +o); set -f
 
     # Store the current value of 'IFS' so we
     # can restore it later.
@@ -125,8 +125,8 @@ yush_split() {
     # Restore the value of 'IFS'.
     IFS=$old_ifs
 
-    # Re-enable globbing.
-    set +f
+    # Restore globbing state
+    set +vx; eval "$_oldstate"
 }
 
 # Performs glob matching, little like Tcl. Explicit support for |, which
@@ -134,11 +134,15 @@ yush_split() {
 # $1 is the matching pattern
 # $2 is the string to test against
 yush_glob() {
+    # Disable globbing.
+    # This ensures that the case is not globbed.
+    _oldstate=$(set +o); set -f
     for ptn in $(yush_split "$1" "|"); do
         case "$2" in
-            $ptn) return 0;;
+            $ptn) set +vx; eval "$_oldstate"; return 0;;
         esac
     done
+    set +vx; eval "$_oldstate"
     return 1
 }
 
@@ -146,17 +150,14 @@ yush_glob() {
 # possible. In other words, this will only output ASCII characters whenever
 # removal leads to error on the current locale.
 yush_printable() {
-    errexit=$(echo "$-"|grep -q 'e')
-    set +e
+    _oldstate=$(set +o); set +e
     clean=$(echo "$1" | tr -cd '[:print:]')
     # shellcheck disable=SC2181
     if [ "$?" != "0" ]; then
         clean=$(echo "$1" | LC_CTYPE=C tr -cd '[:print:]' 2>/dev/null)
     fi
     printf '%s\n' "$clean"
-    if $errexit; then
-        set -e
-    fi
+    set +vx; eval "$_oldstate"
 }
 
 yush_string_is_float_strict() {
