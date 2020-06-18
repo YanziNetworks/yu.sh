@@ -22,12 +22,15 @@ Currently, `yu.sh` is composed of the following modules:
   [original](https://github.com/rcrowley/json.sh)
 + [text.sh] a library to provide higher-level textual operations.
 + [file.sh] a library to operate on files and paths
++ [multi-arch.sh] a library to compensate for missing features across
+  architectures or provide emulation functions.
 
-  [log.sh]:./log.sh
-  [date.sh]:./date.sh
-  [json.sh]:./json.sh
-  [text.sh]:./text.sh
-  [file.sh]:./file.sh
+  [log.sh]: ./log.sh
+  [date.sh]: ./date.sh
+  [json.sh]: ./json.sh
+  [text.sh]: ./text.sh
+  [file.sh]: ./file.sh
+  [multi-arch.sh]: ./multi-arch.sh
 
 ## Testing
 
