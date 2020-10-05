@@ -43,7 +43,7 @@ EOF
             _line=$(printf %s\\n "$line" |
                         tr '`([$' '\1\2\3\4' |
                         sed -f "$_sed" |
-                        sed -e 's/\x04{/${/g' -e 's/"/\"/g')
+                        sed -e 's/\x04{/${/g' -e 's/"/\\\"/g')
             # At this point, eval is safe, since the only expansion left is for
             # ${} contructs. Perform the eval and convert back the control
             # characters to the real chars.
