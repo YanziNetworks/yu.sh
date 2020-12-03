@@ -138,6 +138,7 @@ yush_glob() {
     # This ensures that the case is not globbed.
     _oldstate=$(set +o); set -f
     for ptn in $(yush_split "$1" "|"); do
+        # shellcheck disable=2254
         case "$2" in
             $ptn) set +vx; eval "$_oldstate"; return 0;;
         esac
