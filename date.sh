@@ -15,6 +15,11 @@ yush_howlong() {
         expr "$len" \* 2592000
         return
     fi
+    if echo "$1"|grep -Eqo '^[0-9]+[[:space:]]*[Mm][Ii]'; then
+        len=$(echo "$1"  | sed -En 's/([0-9]+)[[:space:]]*[Mm][Ii].*/\1/p')
+        expr "$len" \* 60
+        return
+    fi
     if echo "$1"|grep -Eqo '^[0-9]+[[:space:]]*m'; then
         len=$(echo "$1"  | sed -En 's/([0-9]+)[[:space:]]*m.*/\1/p')
         expr "$len" \* 2592000
@@ -33,11 +38,6 @@ yush_howlong() {
     if echo "$1"|grep -Eqo '^[0-9]+[[:space:]]*[Hh]'; then
         len=$(echo "$1"  | sed -En 's/([0-9]+)[[:space:]]*[Hh].*/\1/p')
         expr "$len" \* 3600
-        return
-    fi
-    if echo "$1"|grep -Eqo '^[0-9]+[[:space:]]*[Mm][Ii]'; then
-        len=$(echo "$1"  | sed -En 's/([0-9]+)[[:space:]]*[Mm][Ii].*/\1/p')
-        expr "$len" \* 60
         return
     fi
     if echo "$1"|grep -Eqo '^[0-9]+[[:space:]]*M'; then
