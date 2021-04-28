@@ -17,8 +17,9 @@ if [ -z "${YUSH_APPNAME:-}" ]; then
 fi
 
 # YUSH_LOG_PATH is the location of the log. Lines will be appended to that file.
-# It defaults to the standard error.
-[ -z "${YUSH_LOG_PATH:-}" ] && YUSH_LOG_PATH=/dev/stderr
+# It defaults to the empty string, which will be understood as the standard
+# error
+[ -z "${YUSH_LOG_PATH:-}" ] && YUSH_LOG_PATH=
 
 # YUSH_LOG_LEVEL is the logging level that decides which lines will be output or
 # kept away from the log. Available levels are: TRACE, DEBUG, INFO, NOTICE,
@@ -170,10 +171,18 @@ __yush_log() {
     out_level=$(__yush_level "$YUSH_LOG_LEVEL")
     in_level=$(__yush_level "${2:-INFO}")
     if [ "$in_level" -ge "$out_level" ]; then
-        printf "[%s] [%s] [%s] %s\n" \
-                    "$(date +"$YUSH_LOG_DATE_FORMAT")" \
-                    "$(yush_blue "${3:-$YUSH_APPNAME}")" \
-                    "$(__yush_coloured_level "$in_level")" \
-                    "$1" >>$YUSH_LOG_PATH
+        if [ -z "$YUSH_LOG_PATH" ]; then
+            printf "[%s] [%s] [%s] %s\n" \
+                        "$(date +"$YUSH_LOG_DATE_FORMAT")" \
+                        "$(yush_blue "${3:-$YUSH_APPNAME}")" \
+                        "$(__yush_coloured_level "$in_level")" \
+                        "$1" >&2
+        else
+            printf "[%s] [%s] [%s] %s\n" \
+                        "$(date +"$YUSH_LOG_DATE_FORMAT")" \
+                        "$(yush_blue "${3:-$YUSH_APPNAME}")" \
+                        "$(__yush_coloured_level "$in_level")" \
+                        "$1" >>"$YUSH_LOG_PATH"
+        fi
     fi
 }
