@@ -27,5 +27,5 @@ yush_resolv_v4() {
     if [ -z "$_host" ] && command -v host 2>1 >/dev/null; then
         _host=$(host "$1" | grep -Eo -e "$_rx_ip" | head -n 1)
     fi
-    printf %s\\n "$_host"    
+    printf %s\\n "$_host"
 }
